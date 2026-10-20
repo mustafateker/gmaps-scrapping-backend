@@ -17,12 +17,9 @@ client -> FastAPI (api) -> Postgres (jobs/places)
            parses CSV result -> stores rows in Postgres
 ```
 
-The Go scraper itself is never modified or reimplemented — it's run
-unmodified, in `-web` mode, exposing its own REST API. `docker-compose.yml`
-here doesn't bundle that engine as a service; it expects one already
-running and reachable at `GMAPS_SCRAPER_BASE_URL` (e.g. as a `-web`
-process on the host, reached via `http://host.docker.internal:8080`, or
-as your own container/service). This service's job is to give you a
+The Go scraper itself is never modified or reimplemented — Docker Compose runs
+the upstream image unmodified in `-web` mode, exposing its REST API only to the
+internal Compose network. This service's job is to give you a
 stable, versioned API of your own, track jobs in a database you control,
 and normalize results into query-able rows instead of leaving you to poll
 someone else's CSV files.
@@ -43,9 +40,10 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-This starts four containers: `postgres`, `redis` (Celery broker/backend),
+This starts five containers: `postgres`, `redis` (Celery broker/backend),
 `gmaps-scraper` (the Go engine, internal-only), and this service's `api`
-and `worker`.
+and `worker`. The Compose project has the stable name `gmaps-scraping`, and
+the API is also available to attached Docker networks as `gmaps-api:8000`.
 
 The API is available at `http://localhost:8000`.
 
