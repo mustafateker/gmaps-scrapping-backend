@@ -47,6 +47,7 @@ class PlaceResponse(BaseModel):
     category: str | None
     address: str | None
     phone: str | None
+    emails: str | None
     website: str | None
     latitude: float | None
     longitude: float | None

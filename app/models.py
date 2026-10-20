@@ -58,3 +58,14 @@ class Place(Base):
     raw: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
     job: Mapped["Job"] = relationship(back_populates="places")
+
+    @property
+    def emails(self) -> str | None:
+        """Return scraper-discovered email addresses from the raw result."""
+        value = self.raw.get("emails")
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+        if isinstance(value, list):
+            emails = [str(email).strip() for email in value if str(email).strip()]
+            return ", ".join(emails) or None
+        return None
